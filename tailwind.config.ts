@@ -1,20 +1,11 @@
-import type { Config } from "tailwindcss";
-
-const config: Config = {
+module.exports = {
   content: [
-    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/**/*.{html,js,jsx,ts,tsx}", // 소스 파일 경로
+    "./public/index.html", // 추가 경로
+    "./components/**/*.{html,js,jsx,ts,tsx}", // 추가 가능 경로
   ],
   theme: {
-    extend: {
-      backgroundImage: {
-        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-        "gradient-conic":
-          "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
-      },
-    },
+    extend: {},
   },
   plugins: [],
 };
-export default config;
