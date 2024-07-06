@@ -1,19 +1,20 @@
 "use client";
 import React, { useState } from "react";
-import { auth } from "../firebase/firebaseConfig";
+import { auth, app } from "../firebase/firebaseConfig";
+import firebase from "firebase/app";
 import { sendPasswordResetEmail } from "firebase/auth";
-
+import { sendPasswordResetEmailWithCustomRedirect } from "../lib/sendPasswordResetEmail";
 const PasswordResetRequestPage = () => {
-  const [email, setEmail] = useState("");
-  const [resetRequested, setResetRequested] = useState(false);
-  const [error, setError] = useState(null);
+  const [email, setEmail] = useState<string>("");
+  const [resetRequested, setResetRequested] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleResetRequest = async () => {
+  const handleResetRequest = async (): Promise<void> => {
     try {
-      await sendPasswordResetEmail(auth, email);
+      await sendPasswordResetEmailWithCustomRedirect(email);
       setResetRequested(true);
-    } catch (error: any) {
-      setError(error.message);
+    } catch (error) {
+      setError((error as Error).message);
     }
   };
 

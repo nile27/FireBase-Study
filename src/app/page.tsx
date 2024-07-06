@@ -1,7 +1,12 @@
 "use client";
-import { useState, ChangeEvent } from "react";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { useState, ChangeEvent, useEffect } from "react";
+import {
+  signInWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithPopup,
+} from "firebase/auth";
 import { auth, firestore } from "./firebase/firebaseConfig";
+import { signIn, useSession, getProviders, signOut } from "next-auth/react";
 import { User } from "firebase/auth";
 import {
   collection,
@@ -11,11 +16,14 @@ import {
   where,
   getDocs,
 } from "firebase/firestore";
+import { SessionProvider } from "next-auth/react";
+
 const LoginPage = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [data, setData] = useState<User | null | undefined>();
-  const [getEmail, setGetEmail] = useState();
+  const [providers, setProviders] = useState(null);
+
   const handleChangeEmail = (e: ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
   };
@@ -74,6 +82,37 @@ const LoginPage = () => {
     }
   };
 
+  const google = async () => {
+    const provider = new GoogleAuthProvider();
+    const data = await signInWithPopup(auth, provider);
+
+    console.log(data);
+  };
+
+  useEffect(() => {
+    // const script = document.createElement("script");
+    // script.src = "https://developers.kakao.com/sdk/js/kakao.min.js";
+    // script.onload = () => {
+    //   window.Kakao.init(process.env.NEXT_PUBLIC_KAKAO_JAVASCRIPT_KEY);
+    //   console.log("Kakao SDK initialized:", window.Kakao.isInitialized());
+    // };
+    // document.head.appendChild(script);
+    (async () => {
+      const res: any = await getProviders();
+      console.log(res);
+      setProviders(res);
+    })();
+  }, []);
+
+  const handleKakaoLogin = async () => {
+    const handle = await signIn("kakao", {
+      redirect: true,
+      callbackUrl: "/",
+    });
+
+    console.log("Kakao login result:", handle);
+  };
+
   return (
     <div>
       <input
@@ -92,6 +131,12 @@ const LoginPage = () => {
       <img src={data?.photoURL ? data.photoURL : ""} alt="asddsa" />
 
       <button onClick={handleLogin}>Login</button>
+
+      <button onClick={google}>google login</button>
+      <div>
+        <button onClick={handleKakaoLogin}>Kakao 로그인</button>
+        <button onClick={() => signOut()}>Kakao 로그 아웃</button>
+      </div>
     </div>
   );
 };

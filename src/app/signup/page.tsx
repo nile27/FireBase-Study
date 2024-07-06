@@ -16,12 +16,14 @@ import {
   getDocs,
 } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { useRouter } from "next/navigation";
 
 const SignUpPage = () => {
   const [userId, setuserId] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [birth, setBirth] = useState<string>("");
   const [phone, setPhone] = useState<string>("");
+  const navi = useRouter();
 
   const localEmail =
     typeof window !== "undefined"
@@ -58,7 +60,7 @@ const SignUpPage = () => {
         password
       );
       const user = authResult.user;
-
+      console.log(user);
       let photoURL = "";
       if (imgFile) {
         const storageRef = ref(
@@ -133,7 +135,8 @@ const SignUpPage = () => {
         const querySnapshot = await getDocs(q);
 
         if (!querySnapshot.empty) {
-          console.log("이미 이메일이 있습니다.");
+          alert("이미 회원가입이 되어 있습니다.");
+          navi.push("/");
           return; // 이메일이 중복되었으므로 함수 종료
         }
 

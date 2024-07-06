@@ -13,9 +13,7 @@ const Register = () => {
     e.preventDefault();
     try {
       await sendVerificationEmail(email);
-      setMessage(
-        `Verification email sent to ${email}. Please check your email to complete the sign-up process.`
-      );
+      setMessage(`링크를 통해 이메일을 인증해주세요. ${email}`);
     } catch (error: any) {
       setMessage(error.message);
     }

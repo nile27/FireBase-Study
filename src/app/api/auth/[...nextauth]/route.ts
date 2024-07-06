@@ -116,6 +116,7 @@
 import NextAuth from "next-auth";
 import KakaoProvider from "next-auth/providers/kakao";
 import { Session, DefaultSession } from "next-auth";
+import NaverProvider from "next-auth/providers/naver";
 
 interface User {
   id: string;
@@ -131,12 +132,16 @@ declare module "next-auth" {
 }
 
 export const authOptions = {
-  secret:
-    "8C0zN61_8VR6ZVGmv2T7N8J3zQ3OJc2DDcXexQb2Qeo5eFh0-2tcddFf8B6cQ4zhzFRK44SSP0wI_9-BOIiW4A",
+  secret: "LlKq6ZtYbr+hTC073mAmAh9/h2HwMfsFo4hrfCx5mLg=",
   providers: [
     KakaoProvider({
       clientId: process.env.KAKAO_REST_API!,
       clientSecret: process.env.KAKAO_CLIENT_SECRET!,
+      allowDangerousEmailAccountLinking: true,
+    }),
+    NaverProvider({
+      clientId: process.env.NAVER_CLIENT_ID!,
+      clientSecret: process.env.NAVER_CLIENT_SECRET!,
     }),
   ],
   callbacks: {
@@ -163,4 +168,5 @@ export const authOptions = {
 
 const handler = NextAuth(authOptions);
 console.log("sadasldkhjaslkjdlkasjd");
+console.log(process.env.NEXTAUTH_KEY);
 export { handler as GET, handler as POST };

@@ -1,19 +1,47 @@
-// api/route.ts
-
 import { NextApiRequest, NextApiResponse } from "next";
-import { sendVerificationEmail } from "./sendVerificationEmail"; // 함수 임포트
-import { verifyEmailLink } from "./verifyEmailLink";
+import admin from "../firebase/firebaseAdmin";
+import axios from "axios";
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
-  if (req.method === "POST" && req.url === "/sendVerificationEmail") {
-    await sendVerificationEmail(req, res);
-  } else if (req.method === "POST" && req.url === "/verifyEmailLink") {
-    await verifyEmailLink(req, res);
-  } else {
-    res.setHeader("Allow", ["POST"]);
-    res.status(405).end(`Method ${req.method} Not Allowed`);
+interface KakaoAccessTokenInfo {
+  id: number; // 예시로 id 필드만 사용한다고 가정
+  // 필요한 다른 필드들을 여기에 추가할 수 있음
+}
+
+async function verifyKakaoToken(token: string): Promise<number> {
+  const url = "https://kapi.kakao.com/v1/user/access_token_info";
+
+  try {
+    const response = await axios.get<KakaoAccessTokenInfo>(url, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    return response.data.id;
+  } catch (error) {
+    throw new Error(`Kakao API request failed: ${error.message}`);
+  }
+}
+
+export async function POST(req: Request, res: NextApiResponse) {
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method Not Allowed" });
+  }
+
+  const { token } = await req.json();
+  // console.log(token);
+  if (!token) {
+    return res.status(400).json({ error: "Token is required" });
+  }
+
+  try {
+    const kakaoUserId = await verifyKakaoToken(token);
+    const firebaseToken = await admin
+      .auth()
+      .createCustomToken(String(kakaoUserId));
+    return res.status(200).json({ firebaseToken });
+  } catch (error) {
+    console.error("Error verifying Kakao token:", error);
+    return res.status(400).json({ error: "Invalid Kakao token" });
   }
 }
