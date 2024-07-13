@@ -23,6 +23,7 @@ const LoginPage = () => {
   const [password, setPassword] = useState<string>("");
   const [data, setData] = useState<User | null | undefined>();
   const [providers, setProviders] = useState(null);
+  const [goo, setGoo] = useState<string | null>("");
 
   const handleChangeEmail = (e: ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
@@ -85,6 +86,9 @@ const LoginPage = () => {
   const google = async () => {
     const provider = new GoogleAuthProvider();
     const data = await signInWithPopup(auth, provider);
+    if (data.user) {
+      setGoo(data.user.photoURL);
+    }
 
     console.log(data);
   };
@@ -128,7 +132,7 @@ const LoginPage = () => {
         onChange={handleChangePassword}
       />
 
-      <img src={data?.photoURL ? data.photoURL : ""} alt="asddsa" />
+      <img src={goo ? goo : ""} alt="asddsa" />
 
       <button onClick={handleLogin}>Login</button>
 
