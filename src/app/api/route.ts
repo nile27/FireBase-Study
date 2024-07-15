@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import admin from "../firebase/firebaseAdmin";
+import { adminAuth } from "../firebase/firebaseAdmin";
 import axios from "axios";
 
 interface KakaoAccessTokenInfo {
@@ -18,7 +18,7 @@ async function verifyKakaoToken(token: string): Promise<number> {
     });
 
     return response.data.id;
-  } catch (error) {
+  } catch (error: any) {
     throw new Error(`Kakao API request failed: ${error.message}`);
   }
 }
@@ -36,9 +36,9 @@ export async function POST(req: Request, res: NextApiResponse) {
 
   try {
     const kakaoUserId = await verifyKakaoToken(token);
-    const firebaseToken = await admin
-      .auth()
-      .createCustomToken(String(kakaoUserId));
+    const firebaseToken = await adminAuth.createCustomToken(
+      String(kakaoUserId)
+    );
     return res.status(200).json({ firebaseToken });
   } catch (error) {
     console.error("Error verifying Kakao token:", error);
