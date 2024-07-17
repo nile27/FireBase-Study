@@ -52,11 +52,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Parse HTML and extract text nodes
     const dom = new JSDOM(html);
     const textNodes = extractTextNodes(dom.window.document.body);
 
-    // Translate text
     const translations = await Promise.all(
       textNodes.map(async (text) => {
         const result = await translator.translateText(
@@ -68,10 +66,8 @@ export async function POST(req: NextRequest) {
       })
     );
 
-    // Replace text nodes with translations
     replaceTextNodes(dom.window.document.body, translations, { value: 0 });
 
-    // Return translated HTML
     return NextResponse.json({ translatedHTML: dom.serialize() });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
