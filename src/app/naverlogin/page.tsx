@@ -62,7 +62,7 @@ export default function LoginNaver() {
       {session && (
         <>
           <button onClick={() => signOut()}>Sign out</button>
-          <p>Welcome, {session.user.name}</p>
+          <p>Welcome, </p>
           {data && (
             <>
               <p>Signed in as: {data.user.displayName}</p>
