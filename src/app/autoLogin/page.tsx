@@ -6,21 +6,24 @@ import {
   browserLocalPersistence,
   browserSessionPersistence,
 } from "firebase/auth";
+import { useRouter } from "next/navigation";
 import { auth } from "../firebase/firebaseConfig"; // firebase 설정 파일에서 가져옵니다.
 
 const SignIn: React.FC = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [rememberMe, setRememberMe] = useState<boolean>(false);
+  const navi = useRouter();
 
   const handleSignIn = async () => {
     try {
       const persistence = rememberMe
         ? browserLocalPersistence
         : browserSessionPersistence;
-      await setPersistence(auth, persistence);
+      // await setPersistence(auth, persistence);
       await signInWithEmailAndPassword(auth, email, password);
       console.log("로그인 성공");
+      navi.push("/loginAuto");
     } catch (error) {
       console.error("로그인 실패:", error);
     }
