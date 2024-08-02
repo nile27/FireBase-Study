@@ -20,7 +20,7 @@ const SignIn: React.FC = () => {
       const persistence = rememberMe
         ? browserLocalPersistence
         : browserSessionPersistence;
-      // await setPersistence(auth, persistence);
+      await setPersistence(auth, persistence);
       await signInWithEmailAndPassword(auth, email, password);
       console.log("로그인 성공");
       navi.push("/loginAuto");

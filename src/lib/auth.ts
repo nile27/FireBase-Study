@@ -2,8 +2,8 @@ import { NextAuthOptions, User, DefaultSession } from "next-auth";
 import KakaoProvider from "next-auth/providers/kakao";
 import NaverProvider from "next-auth/providers/naver";
 import { JWT } from "next-auth/jwt";
-import { adminauth as adminAuth } from "@/app/firebase/firebaseAdmin";
-import { firestore } from "@/app/firebase/firebaseConfig";
+import { adminauth as adminAuth } from "../app/firebase/firebaseAdmin";
+import { firestore } from "../app/firebase/firebaseConfig";
 import { Timestamp } from "firebase-admin/firestore";
 import {
   collection,
@@ -31,9 +31,10 @@ declare module "next-auth/jwt" {
     isNewUser?: boolean;
   }
 }
+
 declare module "next-auth" {
   interface User {
-    id: string;
+    id?: string;
     name?: string;
     email?: string;
     birth?: string;
@@ -41,23 +42,15 @@ declare module "next-auth" {
     logintype?: string;
     language?: string;
     profile_image?: string;
+    firebaseToken?: string;
+    phone?: string;
+    createTime?: Timestamp;
+    stock?: string[];
   }
+
   interface Session {
     isNewUser?: boolean;
-    user: {
-      id?: string;
-      name?: string;
-      email?: string;
-      birth?: string;
-      nickname?: string;
-      profile_image?: string;
-      firebaseToken?: string;
-      phone?: string;
-      language: string;
-      createTime?: Timestamp;
-      stock?: string[];
-      logintype?: string;
-    } & DefaultSession["user"];
+    user: User;
   }
 }
 
@@ -126,7 +119,6 @@ export const authConfig: NextAuthOptions = {
     },
     async jwt({ token, user }: { token: JWT; user: User }) {
       if (user) {
-        console.log("jwttuser", user);
         token.id = "";
         token.name = user.name;
         token.email = user.email;
@@ -149,7 +141,7 @@ export const authConfig: NextAuthOptions = {
             const userDoc = await getDoc(userRef);
             const userData = userDoc.data();
             const customToken = await adminAuth.createCustomToken(userDoc.id);
-            console.log(userDoc.id);
+
             if (userData) {
               token.id = userData.userId;
               token.name = userData.name;
@@ -168,7 +160,6 @@ export const authConfig: NextAuthOptions = {
             }
           }
         } catch (error: any) {
-          console.log("jwt", error);
           token.isNewUser = true;
         }
       }
